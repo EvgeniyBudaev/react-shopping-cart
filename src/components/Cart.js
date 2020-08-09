@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
+import {connect} from 'react-redux'
 import formatCurrency from '../utils'
 import Fade from 'react-reveal/Fade'
+import {removeFromCart} from '../redux/actions/cartAction'
 
-export default class Cart extends Component {
+class Cart extends Component {
   state =  {
     name: '',
     email: '',
@@ -124,3 +126,13 @@ export default class Cart extends Component {
     )
   }
 }
+
+const mapStateToProps = (state) => ({
+  cartItems: state.cart.cartItems
+})
+
+const mapDispatchToProps = {
+  removeFromCart
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Cart)

@@ -5,6 +5,7 @@ import Fade from 'react-reveal/Fade'
 import Modal from 'react-modal'
 import Zoom from 'react-reveal/Zoom'
 import {fetchProducts} from '../redux/actions/productAction'
+import {addToCart} from '../redux/actions/cartAction'
 
 class Products extends Component {
   state = {product: null}
@@ -116,7 +117,8 @@ const mapStateToProps = (state) => ({
 })
 
 const mapDispatchToProps = {
-  fetchProducts
+  fetchProducts,
+  addToCart
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Products)
