@@ -1,8 +1,11 @@
 import React, { Component } from 'react'
 import {connect} from 'react-redux'
-import formatCurrency from '../utils'
+import Modal from 'react-modal'
+import Zoom from 'react-reveal'
 import Fade from 'react-reveal/Fade'
+import formatCurrency from '../utils'
 import {removeFromCart} from '../redux/actions/cartAction'
+import {clearOrder, createOrder} from '../redux/actions/orderAction'
 
 class Cart extends Component {
   state =  {
@@ -25,16 +28,67 @@ class Cart extends Component {
       email: this.state.email,
       address: this.state.address,
       cartItems: this.props.cartItems,
+      total: this.props.cartItems.reduce((a,b) => a + b.price * b.count, 0)
     }
     this.props.createOrder(order)
   }
 
+  closeModal = () => {
+    this.props.clearOrder( )
+  }
+
   render() {
-    const {cartItems} = this.props
+    const {cartItems, order} = this.props
     return (
       <div>
         {
         cartItems.length === 0 ? <div className="cart cart-header">Cart is empty</div> : <div className="cart cart-header">You have {cartItems.length} in the cart{" "}</div>
+        }
+
+        {
+          order && <Modal isOpen={true} onRequestClose={this.closeModal}>
+            <Zoom>
+              <button className="close-modal" onClick={this.closeModal}>x</button>
+              <div className="order-details ">
+                <h3 className="success-message">You order has been placed</h3>
+                <h2>Order {order._id}</h2>
+                <ul>
+                  <li>
+                    <div>Name:</div>
+                    <div>{order.name}</div>
+                  </li>
+                  <li>
+                    <div>Email:</div>
+                    <div>{order.email}</div>
+                  </li>
+                  <li>
+                    <div>Address:</div>
+                    <div>{order.address}</div>
+                  </li>
+                  <li>
+                    <div>Date:</div>
+                    <div>{order.createdAt}</div>
+                  </li>
+                  <li>
+                    <div>Total:</div>
+                    <div>{formatCurrency(order.total)}</div>
+                  </li>
+                  <li>
+                    <div>Cart Items:</div>
+                    <div>{order.cartItems.map(x => (
+                      <div>
+                        {x.count} {" x "} {x.title}
+                      </div>
+                    ))}</div>
+                  </li>
+                  <li>
+                    <div>Name:</div>
+                    <div>{order.name}</div>
+                  </li>
+                </ul>
+              </div>
+            </Zoom>
+          </Modal>
         }
         <div>
         <div className="cart">
@@ -69,7 +123,7 @@ class Cart extends Component {
                       formatCurrency(cartItems.reduce((a,c) => a + c.price * c.count, 0))
                       }
                     </div>
-                    <button 
+                    <button
                     className="button primary"
                     onClick={() => {this.setState({showCheckout: true})}}
                     >
@@ -84,7 +138,7 @@ class Cart extends Component {
                     <ul className="form-container">
                       <li>
                         <label>Email</label>
-                        <input 
+                        <input
                         name="email"
                         type="email"
                         required
@@ -93,7 +147,7 @@ class Cart extends Component {
                       </li>
                       <li>
                         <label>Name</label>
-                        <input 
+                        <input
                         name="name"
                         type="text"
                         required
@@ -102,7 +156,7 @@ class Cart extends Component {
                       </li>
                       <li>
                         <label>Address</label>
-                        <input 
+                        <input
                         name="address"
                         type="text"
                         required
@@ -110,7 +164,7 @@ class Cart extends Component {
                          />
                       </li>
                       <li>
-                        <button 
+                        <button
                         className="button primary"
                         type="submit">Checkout</button>
                       </li>
@@ -128,11 +182,14 @@ class Cart extends Component {
 }
 
 const mapStateToProps = (state) => ({
+  order: state.order.order,
   cartItems: state.cart.cartItems
 })
 
 const mapDispatchToProps = {
-  removeFromCart
+  removeFromCart,
+  createOrder,
+  clearOrder
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Cart)
